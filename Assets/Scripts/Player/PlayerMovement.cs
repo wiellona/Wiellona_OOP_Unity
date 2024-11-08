@@ -82,8 +82,6 @@ public class PlayerMovement : MonoBehaviour
         yMax = topRight.y - 0.5f;
     }
 
-
-
     public void MoveBound()
     {
         Vector3 clampedPosition = transform.position;

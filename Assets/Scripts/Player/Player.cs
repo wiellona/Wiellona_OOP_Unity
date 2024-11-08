@@ -22,4 +22,22 @@ public class Player : MonoBehaviour
     {
         animator.SetBool("IsMoving", playerMovement.IsMoving());
     }
+
+    // public static Player Instance { get; private set; }
+
+    // void Awake()
+    // {
+    //     // Cek jika sudah ada instance Player yang lain, maka hancurkan yang baru
+    //     if (Instance == null)
+    //     {
+    //         Instance = this;
+    //     }
+    //     else if (Instance != this)
+    //     {
+    //         Destroy(gameObject);
+    //     }
+
+    //     // Pastikan Player tidak dihancurkan saat berpindah scene
+    //     DontDestroyOnLoad(gameObject);
+    // }
 }
