@@ -1,63 +1,34 @@
-// using System.Collections;
-// using UnityEngine;
-// using UnityEngine.SceneManagement;
+using System.Collections;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
-// public class LevelManager : MonoBehaviour
-// {
-//     [SerializeField] private Animator Animation; // Animator untuk transisi
-//     private static readonly int StartTrigger = Animator.StringToHash("Start"); // Trigger untuk mulai transisi
+// Singleton
+public class LevelManager : MonoBehaviour
+{
+    [SerializeField] Animator animator;
 
-//     void Awake()
-//     {
-//         // Pastikan Animator dinonaktifkan di awal
-//         if (Animation != null)
-//         {
-//             Animation.enabled = false;
-//         }
-//     }
+    void Awake()
+    {
+        animator.enabled = false;
+    }
 
-//     // Coroutine untuk memuat scene baru secara asynchronous
-//     IEnumerator LoadSceneAsync(string sceneName)
-//     {
-//         // Aktifkan Animator dan jalankan transisi
-//         if (Animation != null)
-//         {
-//             Animation.enabled = true;
-//             Animation.SetTrigger(StartTrigger); // Mulai transisi animasi
-//         }
+    IEnumerator LoadSceneAsync(string sceneName)
+    {
+        animator.enabled = true;
 
-//         // Tunggu selama durasi animasi transisi (misalnya 1 detik)
-//         yield return new WaitForSeconds(1);
+        animator.SetTrigger("StartTransition");
 
-//         // Load scene baru secara asynchronous
-//         AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName);
+        yield return new WaitForSeconds(1);
 
-//         // Tunggu hingga scene baru selesai dimuat
-//         while (!asyncLoad.isDone)
-//         {
-//             yield return null;
-//         }
+        SceneManager.LoadSceneAsync(sceneName);
 
-//         // Setelah scene selesai dimuat, posisikan ulang Player
-//         if (Player.Instance != null)
-//         {
-//             Player.Instance.transform.position = new Vector3(0, -4.5f, 0);
-//         }
-//         else
-//         {
-//             Debug.LogWarning("Player instance not found!");
-//         }
+        animator.SetTrigger("EndTransition");
 
-//         // Nonaktifkan Animator setelah transisi selesai
-//         if (Animation != null)
-//         {
-//             Animation.enabled = false;
-//         }
-//     }
+        Player.Instance.transform.position = new(0, -4.5f);
+    }
 
-//     // Method untuk memulai proses loading scene
-//     public void LoadScene(string sceneName)
-//     {
-//         StartCoroutine(LoadSceneAsync(sceneName));
-//     }
-// }
+    public void LoadScene(string sceneName)
+    {
+        StartCoroutine(LoadSceneAsync(sceneName));
+    }
+}

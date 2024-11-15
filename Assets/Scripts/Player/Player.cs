@@ -6,7 +6,8 @@ public class Player : MonoBehaviour
 {
     private PlayerMovement playerMovement;
     private Animator animator;
-
+    public static Player Instance { get; private set; }
+    
     void Start()
     {
         playerMovement = GetComponent<PlayerMovement>();
@@ -23,21 +24,16 @@ public class Player : MonoBehaviour
         animator.SetBool("IsMoving", playerMovement.IsMoving());
     }
 
-    // public static Player Instance { get; private set; }
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(this);
+            return;
+        }
 
-    // void Awake()
-    // {
-    //     // Cek jika sudah ada instance Player yang lain, maka hancurkan yang baru
-    //     if (Instance == null)
-    //     {
-    //         Instance = this;
-    //     }
-    //     else if (Instance != this)
-    //     {
-    //         Destroy(gameObject);
-    //     }
+        Instance = this;
 
-    //     // Pastikan Player tidak dihancurkan saat berpindah scene
-    //     DontDestroyOnLoad(gameObject);
-    // }
+        DontDestroyOnLoad(gameObject);
+    }
 }
