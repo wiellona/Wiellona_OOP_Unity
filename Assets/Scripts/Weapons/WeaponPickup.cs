@@ -2,57 +2,99 @@ using UnityEngine;
 
 public class WeaponPickup : MonoBehaviour
 {
-    [SerializeField] private Weapon weaponHolder; // Weapon yang akan diberikan ke player
-    private Weapon weapon; // Weapon yang menjadi bagian dari pickup
+    [SerializeField] Weapon weaponHolder;
 
+    Weapon weapon;
+
+    // Spawn WeaponHolder Object when the game start
     void Awake()
     {
-        // Buat instance baru dari weaponHolder untuk digunakan sebagai weapon pickup
-        weapon = Instantiate(weaponHolder);
+        if (weaponHolder != null)
+            weapon = Instantiate(weaponHolder);
     }
 
+    // Set default value for weaponHolder
     void Start()
     {
-        if (weapon != null)
+        // if no weaponHolder provided, dont do anything
+        if (weapon == null)
+            return;
+
+        // TurnVisual so the weapon sprites doesnt crash with weapon pickup sprites
+        TurnVisual(false);
+
+        // Turn off the functionality of weapon
+        weapon.enabled = false;
+        // Make the weapon object to be children of weaponHolder
+        weapon.transform.SetParent(transform, false);
+        // Match the parent positions
+        weapon.transform.localPosition = transform.position;
+
+        // save transform to reset the position
+        weapon.parentTransform = transform;
+    }
+
+    // Ini kalo misal si objek weapon pickup "kena" objek Player, masukin slot weapon yang ada di weaponHolder ke slot Weapon si Player
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        // Trigger itu bisa ke semua objek, jadi harus cari si Player
+        if (weapon != null && other.gameObject.CompareTag("Player"))
         {
-            TurnVisual(false); // Sembunyikan visual weapon pada awalnya
+            Weapon playerWeapon = other.gameObject.GetComponentInChildren<Weapon>();
+
+            // Kalo misal slot Weapon si Player udah penuh (udah ada Weapon)
+            // Maka tuker Weapon yang baru disentuh sama Weapon yang ada di slot
+            // Kalo mau liat cara kerjanya bisa tambahin aja objek WeaponPickup
+            // di WeaponRack terus bedain posisi antar dua Weapon
+            if (playerWeapon != null)
+            {
+                playerWeapon.transform.SetParent(playerWeapon.parentTransform);
+                playerWeapon.transform.localScale = new(1, 1);
+                playerWeapon.transform.localPosition = new(0, 0);
+
+                TurnVisual(false, playerWeapon);
+            }
+
+            weapon.enabled = true;
+            weapon.transform.SetParent(other.transform, false);
+
+            TurnVisual(true);
+
+            weapon.transform.localPosition = new(0.0f, 0.0f);
         }
     }
 
-    void OnTriggerEnter2D(Collider2D collision)
+    void TurnVisual(bool on)
     {
-        if (collision.CompareTag("Player"))
+        if (on)
         {
-            Debug.Log("Objek Player Memasuki trigger");
-
-            // Cari apakah ada weapon yang sudah terpasang pada player
-            Weapon currentWeapon = collision.gameObject.GetComponentInChildren<Weapon>();
-
-            // Jika ada, nonaktifkan tampilan weapon lama (tanpa menghancurkannya)
-            if (currentWeapon != null)
-            {
-                currentWeapon.gameObject.SetActive(false);
-            }
-
-            // Lampirkan weapon baru pada player
-            weapon.transform.SetParent(collision.transform);
-            weapon.transform.localPosition = Vector3.zero;
-
-            // Aktifkan tampilan weapon baru
-            TurnVisual(true);
+            weapon.GetComponent<SpriteRenderer>().enabled = true;
+            weapon.GetComponent<Animator>().enabled = true;
+            weapon.GetComponent<Weapon>().enabled = true;
         }
         else
         {
-            Debug.Log("Bukan Objek Player yang memasuki Trigger");
+            weapon.GetComponent<SpriteRenderer>().enabled = false;
+            weapon.GetComponent<Animator>().enabled = false;
+            weapon.GetComponent<Weapon>().enabled = false;
         }
+
     }
 
-    // Metode untuk menyalakan atau mematikan visual
-    public void TurnVisual(bool on)
+    void TurnVisual(bool on, Weapon weapon)
     {
-        if (weapon != null)
+        if (on)
         {
-            weapon.gameObject.SetActive(on);
+            weapon.GetComponent<SpriteRenderer>().enabled = true;
+            weapon.GetComponent<Animator>().enabled = true;
+            weapon.GetComponent<Weapon>().enabled = true;
         }
+        else
+        {
+            weapon.GetComponent<SpriteRenderer>().enabled = false;
+            weapon.GetComponent<Animator>().enabled = false;
+            weapon.GetComponent<Weapon>().enabled = false;
+        }
+
     }
 }
